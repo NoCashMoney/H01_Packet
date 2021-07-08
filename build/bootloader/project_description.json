@@ -1,0 +1,21 @@
+{
+    "project_name":       "bootloader",
+    "project_path":       "/home/jinpark/esp/esp-idf/components/bootloader/subproject",
+    "build_dir":          "/home/jinpark/H01_Packet/build/bootloader",
+    "config_file":        "/home/jinpark/H01_Packet/sdkconfig",
+    "config_defaults":    "",
+    "app_elf":            "bootloader.elf",
+    "app_bin":            "bootloader.bin",
+    "git_revision":       "v4.4-dev-1594-g1d7068e4b",
+    "target":             "esp32",
+    "rev":                "0",
+    "phy_data_partition": "",
+    "monitor_baud" :      "460800",
+    "monitor_toolprefix": "xtensa-esp32-elf-",
+    "config_environment" : {
+        "COMPONENT_KCONFIGS" : "/home/jinpark/esp/esp-idf/components/efuse/Kconfig;/home/jinpark/esp/esp-idf/components/esp32/Kconfig;/home/jinpark/esp/esp-idf/components/esp_common/Kconfig;/home/jinpark/esp/esp-idf/components/esp_hw_support/Kconfig;/home/jinpark/esp/esp-idf/components/esp_system/Kconfig;/home/jinpark/esp/esp-idf/components/freertos/Kconfig;/home/jinpark/esp/esp-idf/components/log/Kconfig;/home/jinpark/esp/esp-idf/components/newlib/Kconfig;/home/jinpark/esp/esp-idf/components/spi_flash/Kconfig",
+        "COMPONENT_KCONFIGS_PROJBUILD" : "/home/jinpark/esp/esp-idf/components/bootloader/Kconfig.projbuild;/home/jinpark/esp/esp-idf/components/esp_rom/Kconfig.projbuild;/home/jinpark/esp/esp-idf/components/esptool_py/Kconfig.projbuild;/home/jinpark/esp/esp-idf/components/partition_table/Kconfig.projbuild"
+    },
+    "build_components" : [ "bootloader", "bootloader_support", "efuse", "esp32", "esp_common", "esp_hw_support", "esp_rom", "esp_system", "esptool_py", "freertos", "hal", "log", "main", "micro-ecc", "newlib", "partition_table", "soc", "spi_flash", "xtensa", "" ],
+    "build_component_paths" : [ "/home/jinpark/esp/esp-idf/components/bootloader", "/home/jinpark/esp/esp-idf/components/bootloader_support", "/home/jinpark/esp/esp-idf/components/efuse", "/home/jinpark/esp/esp-idf/components/esp32", "/home/jinpark/esp/esp-idf/components/esp_common", "/home/jinpark/esp/esp-idf/components/esp_hw_support", "/home/jinpark/esp/esp-idf/components/esp_rom", "/home/jinpark/esp/esp-idf/components/esp_system", "/home/jinpark/esp/esp-idf/components/esptool_py", "/home/jinpark/esp/esp-idf/components/freertos", "/home/jinpark/esp/esp-idf/components/hal", "/home/jinpark/esp/esp-idf/components/log", "/home/jinpark/esp/esp-idf/components/bootloader/subproject/main", "/home/jinpark/esp/esp-idf/components/bootloader/subproject/components/micro-ecc", "/home/jinpark/esp/esp-idf/components/newlib", "/home/jinpark/esp/esp-idf/components/partition_table", "/home/jinpark/esp/esp-idf/components/soc", "/home/jinpark/esp/esp-idf/components/spi_flash", "/home/jinpark/esp/esp-idf/components/xtensa", "" ]
+}
