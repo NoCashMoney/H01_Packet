@@ -28,6 +28,18 @@ static const char *TAG = "gps_demo";
 uint8_t BAUDRATE_CONFIG[] = "\r\n$PMTK251,115200*1F\r\n";
 uint8_t FIX_PERIOD_CONFIG[] = "\r\n$PMTK220,100*2F\r\n";
 
+/**
+ * @brief Change to Little endian type
+ *
+ * @param raw_data the data which will be little endian type
+ * @param changed_data the little endian type data will be saved in this pointer
+ * @param data_size the size of raw_data(==changed_data), (n Byte)
+ */
+void make_little_endian(int16_t *raw_data, int16_t *changed data, uint8_t data_size)
+{
+    
+}
+
 
 // for get "Week-number"
 time_t time_frem_YMD(int year, int month, int day) {
@@ -135,8 +147,6 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
         nav_pvt->magAcc = 0;
 
         //TODO TEST Little endian
-        ESP_LOGI(TAG, "\r\nnav_pvt %p\r\niTOW %p\r\n Year %p\r\nsize of nav_pvt_t %d\r\n", nav_pvt, &((*nav_pvt).iTOW), &((*nav_pvt).iTOW)+1 , sizeof(nav_pvt_t));
-
 
 
         //TODO $PMTK220,100*1F fix period set 10Hz
