@@ -53,3 +53,6 @@ dkms.conf
 
 # build directory
 build/
+
+# vscode json file
+.vscode/
