@@ -24,6 +24,7 @@ static const char *TAG = "gps_demo";
 #define SECS_PER_DAY (60L*60*24)
 #define SECS_PER_WEEK (SECS_PER_DAY*7)
 #define LEAF_SECOND (18)
+#define MAX_SECS_OF_WEEK (604799) // 0 ~ 604799, 604800 = 0
 
 uint8_t BAUDRATE_CONFIG[] = "\r\n$PMTK251,115200*1F\r\n";
 uint8_t FIX_PERIOD_CONFIG[] = "\r\n$PMTK220,100*2F\r\n";
@@ -35,9 +36,12 @@ uint8_t FIX_PERIOD_CONFIG[] = "\r\n$PMTK220,100*2F\r\n";
  * @param changed_data the little endian type data will be saved in this pointer
  * @param data_size the size of raw_data(==changed_data), (n Byte)
  */
-void make_little_endian(int16_t *raw_data, int16_t *changed data, uint8_t data_size)
+void make_little_endian(int16_t *raw_data, int16_t *changed_data, uint8_t data_size) //TODO NEED TO TEST
 {
-    
+	for(int count = (data_size - 1); count >= 0; count--)
+	{
+		*(changed_data + data_size) = ((*raw_data) >> (8 * count)) && 0xFF;
+	}
 }
 
 
@@ -53,13 +57,19 @@ time_t time_frem_YMD(int year, int month, int day) {
 }
 // for get "Week-number"
 int get_gps_week_number(int year, int month, int day) {
-  double diff = difftime(time_frem_YMD(year, month, day), time_frem_YMD(1980, 1, 6));
-  return (int) (diff / SECS_PER_WEEK);
+	double diff = difftime(time_frem_YMD(year, month, day), time_frem_YMD(1980, 1, 6));
+	return (int) (diff / SECS_PER_WEEK);
 }
 
-int get_gps_iTOW(int year, int month, int day, int hour, int min, int sec) {
-  double diff = difftime(time_frem_YMD(year, month, day), time_frem_YMD(1980, 1, 6));
-  return (uint32_t) fmod(diff, SECS_PER_WEEK) + (hour * 3600) + (min * 60) + sec + LEAF_SECOND;
+// FIXME NEED TO CHECK THE RESULT WHICH BEFORE THE 1980/1/6
+int get_gps_iTOW(int year, int month, int day, int hour, int min, int sec) { // TODO NEED TO TEST
+	double diff = difftime(time_frem_YMD(year, month, day), time_frem_YMD(1980, 1, 6));
+	double buffer = fmod(diff, SECS_PER_WEEK) + (hour * 3600) + (min * 60) + sec + LEAF_SECOND;
+	if(buffer > MAX_SECS_OF_WEEK)
+	{
+		buffer -= (MAX_SECS_OF_WEEK + 1);
+	}
+	return (uint32_t) buffer;
 }
 
 
@@ -71,7 +81,7 @@ int get_gps_iTOW(int year, int month, int day, int hour, int min, int sec) {
  * @param event_id event id
  * @param event_data event specific arguments
  */
-static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) // TODO this function will be packet making function
+static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     gps_t *gps = NULL;
     nav_pvt_t *nav_pvt = malloc(sizeof(nav_pvt_t));
