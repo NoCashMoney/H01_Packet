@@ -156,6 +156,9 @@ typedef enum {
 } nav_pvt_fix_mode_t;
 
 typedef struct {
+	uint16_t header;		// Packet header
+	uint8_t class;			// Class
+	uint8_t id;				// Id
     uint32_t iTOW;                  // Time of week (sec)
     gps_date_t date;                // Date from GPS (UTC+0)
     gps_time_t time;                // Time from GPS (UTC+0)
@@ -185,8 +188,7 @@ typedef struct {
     int32_t headVeh;                // Heading of vehicle (2-D)
     int16_t magDec;                 // Magnetic declination
     uint16_t magAcc;                // Magnetic declination accuracy
-    uint8_t checksum_A;             // Checksum A CK_A = CK_A + Buffer[I]
-    uint8_t checksum_B;             // Checksum B CK_B = CK_B + CK_A
+    uint16_t checksum;             // Checksum A CK_A = CK_A + Buffer[I]
 } nav_pvt_t;
 
 

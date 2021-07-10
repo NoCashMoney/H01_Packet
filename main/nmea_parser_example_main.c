@@ -86,6 +86,10 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
     gps_t *gps = NULL;
     nav_pvt_t *nav_pvt = malloc(sizeof(nav_pvt_t));
 
+	nav_pvt->header = 0xB562;
+	nav_pvt->class = 0x01;
+	nav_pvt->id = 0x07;
+
     switch (event_id) {
     case GPS_UPDATE:
         gps = (gps_t *)event_data;
