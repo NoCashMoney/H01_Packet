@@ -156,9 +156,10 @@ typedef enum {
 } nav_pvt_fix_mode_t;
 
 typedef struct {
-	uint16_t header;		// Packet header
-	uint8_t class;			// Class
-	uint8_t id;				// Id
+    uint16_t header;		        // Packet header
+    uint8_t class;			        // Class
+    uint8_t id;			        	// Id
+    uint16_t length;                // payload length
     uint32_t iTOW;                  // Time of week (sec)
     gps_date_t date;                // Date from GPS (UTC+0)
     gps_time_t time;                // Time from GPS (UTC+0)
