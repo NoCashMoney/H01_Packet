@@ -61,10 +61,9 @@ int get_gps_week_number(int year, int month, int day) {
 	return (int) (diff / SECS_PER_WEEK);
 }
 
-// FIXME NEED TO CHECK THE RESULT WHICH BEFORE THE 1980/1/6
-int get_gps_iTOW(int year, int month, int day, int hour, int min, int sec) { // TODO NEED TO TEST
+int get_gps_iTOW(int year, int month, int day, int hour, int min, int sec) {
 	double diff = difftime(time_frem_YMD(year, month, day), time_frem_YMD(1980, 1, 6));
-	double buffer = fmod(diff, SECS_PER_WEEK) + (hour * 3600) + (min * 60) + sec + LEAF_SECOND;
+	uint32_t buffer =  (int) (fmod(diff, SECS_PER_WEEK) + (hour * 3600) + (min * 60) + sec + LEAF_SECOND);
 	if(buffer > MAX_SECS_OF_WEEK)
 	{
 		buffer -= (MAX_SECS_OF_WEEK + 1);
@@ -97,7 +96,8 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
         //TODO Making NAG-PVT Packet here
         //TODO Need to check the variables with 0 are not used in 3SECONDZ service
 
-        nav_pvt->iTOW = get_gps_iTOW(gps->date.year + YEAR_BASE, gps->date.month, gps->date.day, gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second);
+        // nav_pvt->iTOW = get_gps_iTOW(gps->date.year + YEAR_BASE, gps->date.month, gps->date.day, gps->tim.hour, g`ps->tim.minute, gps->tim.second);
+        nav_pvt->iTOW = get_gps_iTOW(1980,1,6,0,0,0);
         nav_pvt->date.year = gps->date.year;
         nav_pvt->date.month = gps->date.month;
         nav_pvt->date.day = gps->date.day;
@@ -161,7 +161,7 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
         nav_pvt->magAcc = 0;
 
         //TODO TEST Little endian
-
+        ESP_LOGI(TAG, "iTOW - %d\r\n", nav_pvt->iTOW);
 
         //TODO $PMTK220,100*1F fix period set 10Hz
 
