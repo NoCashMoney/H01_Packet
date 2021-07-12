@@ -18,10 +18,9 @@
 
 static const char *TAG = "gps_demo";
 
-//TODO DO NOT USE TIMEZONE
-// #define TIME_ZONE (+8)   //Beijing Time
-// #define TIME_ZONE (+9)   //Seoul Time
+#define __GNSS_COORDINATE_MODE (1) // 0: NAV_PVT OUTPUT  1: COORDINATE OUTPUT
 
+#define TIME_ZONE (+9)   //Seoul Time
 #define YEAR_BASE (2000) //date in GPS starts from 2000
 #define SECS_PER_DAY (60L*60*24)
 #define SECS_PER_WEEK (SECS_PER_DAY*7)
@@ -132,6 +131,18 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
     case GPS_UPDATE:
         gps = (gps_t *)event_data;
 
+#if (__GNSS_COORDINATE_MODE == 1)
+        /* print information parsed from GPS statements */
+        ESP_LOGI(TAG, "%d/%d/%d %d:%d:%d => "
+                 "\t\tlatitude   = %.05f°N"
+                 "\t\tlongitude = %.05f°E"
+                 "\t\taltitude   = %.02fm"
+                 "\t\tspeed      = %fm/s\r\n",
+                 gps->date.year + YEAR_BASE, gps->date.month, gps->date.day,
+                 gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
+                 gps->latitude, gps->longitude, gps->altitude, gps->speed);
+
+#elif (__GNSS_COORDINATE_MODE == 0)
         //TODO Making NAG-PVT Packet here
         //TODO Need to check the variables with 0 are not used in 3SECONDZ service
 
@@ -282,8 +293,7 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
 
         //TODO $PMTK220,100*1F fix period set 10Hz
 
-        free(nav_pvt_struct);
-
+#endif
 
         break;
     case GPS_UNKNOWN:
@@ -292,6 +302,8 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
         break;
     default:
         break;
+
+    free(nav_pvt_struct);
     }
 }
 
