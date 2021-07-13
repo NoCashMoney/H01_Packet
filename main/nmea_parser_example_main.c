@@ -41,7 +41,7 @@ uint8_t FIX_PERIOD_CONFIG[] = "\r\n$PMTK220,100*2F\r\n";
  * @param array_size the size of raw_data(==changed_data), (n Byte)
  * @param array_address_buffer this agur will be increased by array_size and returned
  */
-void make_little_endian(int32_t *raw_data, uint8_t *changed_data, uint8_t array_size, uint32_t *array_address_buffer) //TODO NEED TO TEST
+void make_little_endian(int32_t *raw_data, uint8_t *changed_data, uint8_t array_size, uint32_t *array_address_buffer)
 {
     for(int count = (array_size - 1); count >= 0; count--)
 	{
@@ -143,7 +143,6 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
                  gps->latitude, gps->longitude, gps->altitude, gps->speed);
 
 #elif (__GNSS_COORDINATE_MODE == 0)
-        //TODO Making NAG-PVT Packet here
         //TODO Need to check the variables with 0 are not used in 3SECONDZ service
 
         nav_pvt_struct->header = 0xB562;
@@ -282,16 +281,11 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
         data_length_buffer += 1;
 
 
-        for(int i = 0; i < data_length_buffer; i++)
+        for(int i = 0; i < data_length_buffer; i++) // TODO PACKET MAKING TESTED
         {
             printf("%02x ", nav_pvt_array[i]);
         }
         printf(" // data_length_buffer - %d // nav_pvt_t - %d\r\n", data_length_buffer, sizeof(nav_pvt_t));
-
-        //TODO TEST Little endian
-
-
-        //TODO $PMTK220,100*1F fix period set 10Hz
 
 #endif
 

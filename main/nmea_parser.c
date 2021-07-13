@@ -582,7 +582,6 @@ static void esp_handle_uart_pattern(esp_gps_t *esp_gps)
 
         /* make sure the line is a standard string */
         esp_gps->buffer[read_len] = '\0';
-        // ESP_LOGI(GPS_TAG, "%s", esp_gps->buffer); //FIXME
         /* Send new line to handle */
         if (gps_decode(esp_gps, read_len + 1) != ESP_OK) {
             ESP_LOGW(GPS_TAG, "GPS decode line failed");
@@ -636,8 +635,6 @@ static void nmea_parser_task_entry(void *arg)
         }
         /* Drive the event loop */
         esp_event_loop_run(esp_gps->event_loop_hdl, pdMS_TO_TICKS(1));
-
-        // ESP_LOGI(GPS_TAG, "%d\r\n",uxTaskGetStackHighWaterMark(NULL)); //FIXME
     }
     vTaskDelete(NULL);
 }
@@ -690,7 +687,7 @@ nmea_parser_handle_t nmea_parser_init(const nmea_parser_config_t *config)
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
         .source_clk = UART_SCLK_APB,
     };
-    if (uart_driver_install(esp_gps->uart_port, CONFIG_NMEA_PARSER_RING_BUFFER_SIZE, CONFIG_NMEA_PARSER_RING_BUFFER_SIZE, //FIXME
+    if (uart_driver_install(esp_gps->uart_port, CONFIG_NMEA_PARSER_RING_BUFFER_SIZE, CONFIG_NMEA_PARSER_RING_BUFFER_SIZE,
                             config->uart.event_queue_size, &esp_gps->event_queue, 0) != ESP_OK) {
         ESP_LOGE(GPS_TAG, "install uart driver failed");
         goto err_uart_install;
@@ -722,7 +719,7 @@ nmea_parser_handle_t nmea_parser_init(const nmea_parser_config_t *config)
     BaseType_t err = xTaskCreate(
                          nmea_parser_task_entry,
                          "nmea_parser",
-                         4096, //FIXME STACK size must be over 4096
+                         4096,
                          esp_gps,
                          CONFIG_NMEA_PARSER_TASK_PRIORITY,
                          &esp_gps->tsk_hdl);
