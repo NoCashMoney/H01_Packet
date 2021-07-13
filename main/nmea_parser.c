@@ -107,6 +107,7 @@ static void parse_utc_time(esp_gps_t *esp_gps)
     }
 }
 
+//TODO ENABLE NMEA TYPES MANUALLY
 #if CONFIG_NMEA_STATEMENT_GGA
 /**
  * @brief Parse GGA statements

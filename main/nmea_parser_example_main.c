@@ -18,7 +18,7 @@
 
 static const char *TAG = "gps_demo";
 
-#define __GNSS_COORDINATE_MODE (1) // 0: NAV_PVT OUTPUT  1: COORDINATE OUTPUT
+#define __GNSS_COORDINATE_MODE (0) // 0: NAV_PVT OUTPUT  1: COORDINATE OUTPUT
 
 #define TIME_ZONE (+9)   //Seoul Time
 #define YEAR_BASE (2000) //date in GPS starts from 2000
