@@ -18,8 +18,6 @@
 
 static const char *TAG = "gps_demo";
 
-#define __GNSS_COORDINATE_MODE (0) // 0: NAV_PVT OUTPUT  1: COORDINATE OUTPUT
-
 #define TIME_ZONE (+9)   //Seoul Time
 #define YEAR_BASE (2000) //date in GPS starts from 2000
 #define SECS_PER_DAY (60L*60*24)
@@ -100,14 +98,14 @@ int get_gps_week_number(int year, int month, int day) {
 	return (int) (diff / SECS_PER_WEEK);
 }
 
-int get_gps_iTOW(int year, int month, int day, int hour, int min, int sec) {
+int get_gps_iTOW(int year, int month, int day, int hour, int min, int sec, int thousand) {
 	double diff = difftime(time_frem_YMD(year, month, day), time_frem_YMD(1980, 1, 6));
 	uint32_t buffer =  (int) (fmod(diff, SECS_PER_WEEK) + (hour * 3600) + (min * 60) + sec + LEAF_SECOND);
 	if(buffer > MAX_SECS_OF_WEEK)
 	{
 		buffer -= (MAX_SECS_OF_WEEK + 1);
 	}
-	return (uint32_t) buffer;
+	return (uint32_t) (buffer * 1000) + thousand;
 }
 
 
@@ -131,7 +129,10 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
     case GPS_UPDATE:
         gps = (gps_t *)event_data;
 
-#if (__GNSS_COORDINATE_MODE == 1)
+#if (__GNSS_COORDINATE_MODE == 2)
+        printf("%s", (char *)event_data);
+
+#elif (__GNSS_COORDINATE_MODE == 1)
         /* print information parsed from GPS statements */
         ESP_LOGI(TAG, "%d/%d/%d %d:%d:%d => "
                  "\t\tlatitude   = %.05f°N"
@@ -158,13 +159,14 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
         nav_pvt_array[5] = 0x00;
         data_length_buffer = sizeof(nav_pvt_struct->header) + sizeof(nav_pvt_struct->class) + sizeof(nav_pvt_struct->id) + 2;
 
-        nav_pvt_struct->iTOW = get_gps_iTOW(gps->date.year + YEAR_BASE, gps->date.month, gps->date.day, gps->tim.hour, gps->tim.minute, gps->tim.second);
+        nav_pvt_struct->iTOW = get_gps_iTOW(gps->date.year + YEAR_BASE, gps->date.month, gps->date.day, gps->tim.hour, gps->tim.minute, gps->tim.second, gps->tim.thousand);
         nav_pvt_struct->date.year = gps->date.year + YEAR_BASE;
         nav_pvt_struct->date.month = gps->date.month;
         nav_pvt_struct->date.day = gps->date.day;
         nav_pvt_struct->time.hour = gps->tim.hour;
         nav_pvt_struct->time.minute = gps->tim.minute;
         nav_pvt_struct->time.second = gps->tim.second;
+        nav_pvt_struct->time.thousand = gps->tim.thousand;
 
         nav_pvt_struct->valid = 0;
 
@@ -191,9 +193,8 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
 
         nav_pvt_struct->numSV = gps->sats_in_use;
 
-        nav_pvt_struct->lat = (int32_t) ((double_t) gps->latitude * (double_t) 10000000); //FIXME When move value to nav_pvt type, the value can be changed, need to fix
-        nav_pvt_struct->lon = (int32_t) ((double_t) gps->longitude * (double_t) 10000000); //FIXME When move value to nav_pvt type, the value can be changed, need to fix
-
+        nav_pvt_struct->lon = gps->longitude;
+        nav_pvt_struct->lat = gps->latitude;
         nav_pvt_struct->height = (int32_t) ((double_t) gps->altitude * (double_t) 1000); // nav_pvt - mm, gps - m //FIXME When move value to nav_pvt type, the value can be changed, need to fix
 
         nav_pvt_struct->hMSL = 0; //FIXME use Geoidal field
@@ -244,8 +245,8 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
 
         make_little_endian((int32_t) &(nav_pvt_struct->numSV), &(nav_pvt_array[data_length_buffer]), sizeof(nav_pvt_struct->numSV), &data_length_buffer);
 
-        make_little_endian((int32_t) &(nav_pvt_struct->lat), &(nav_pvt_array[data_length_buffer]), sizeof(nav_pvt_struct->lat), &data_length_buffer);
         make_little_endian((int32_t) &(nav_pvt_struct->lon), &(nav_pvt_array[data_length_buffer]), sizeof(nav_pvt_struct->lon), &data_length_buffer);
+        make_little_endian((int32_t) &(nav_pvt_struct->lat), &(nav_pvt_array[data_length_buffer]), sizeof(nav_pvt_struct->lat), &data_length_buffer);
         make_little_endian((int32_t) &(nav_pvt_struct->height), &(nav_pvt_array[data_length_buffer]), sizeof(nav_pvt_struct->height), &data_length_buffer);
 
         make_little_endian((int32_t) &(nav_pvt_struct->hMSL), &(nav_pvt_array[data_length_buffer]), sizeof(nav_pvt_struct->hMSL), &data_length_buffer);
@@ -285,7 +286,8 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
         {
             printf("%02x ", nav_pvt_array[i]);
         }
-        printf(" // data_length_buffer - %d // nav_pvt_t - %d\r\n", data_length_buffer, sizeof(nav_pvt_t));
+        printf("\r\n");
+        // printf(" // data_length_buffer - %d // nav_pvt_t - %d\r\n", data_length_buffer, sizeof(nav_pvt_t));
 
 #endif
 

@@ -23,6 +23,8 @@ extern "C" {
 #include "esp_err.h"
 #include "driver/uart.h"
 
+#define __GNSS_COORDINATE_MODE (0) // 0: NAV_PVT OUTPUT  1: COORDINATE OUTPUT  2: GNSS DIRECT MODE
+
 #define GPS_MAX_SATELLITES_IN_USE (12)
 #define GPS_MAX_SATELLITES_IN_VIEW (16)
 
@@ -103,8 +105,8 @@ typedef enum {
  *
  */
 typedef struct {
-    float latitude;                                                /*!< Latitude (degrees) */
-    float longitude;                                               /*!< Longitude (degrees) */
+    int32_t latitude;                                                /*!< Latitude (degrees) */
+    int32_t longitude;                                               /*!< Longitude (degrees) */
     float altitude;                                                /*!< Altitude (meters) */
     gps_fix_t fix;                                                 /*!< Fix status */
     uint8_t sats_in_use;                                           /*!< Number of satellites in use */
@@ -202,7 +204,7 @@ typedef struct {
     {                                      \
         .uart = {                          \
             .uart_port = UART_NUM_2,       \
-            .rx_pin = 10,                   \
+            .rx_pin = 27,                   \
             .baud_rate = 115200,             \
             .data_bits = UART_DATA_8_BITS, \
             .parity = UART_PARITY_DISABLE, \

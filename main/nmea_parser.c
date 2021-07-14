@@ -64,14 +64,37 @@ typedef struct {
  * @brief parse latitude or longitude
  *              format of latitude in NMEA is ddmm.sss and longitude is dddmm.sss
  * @param esp_gps esp_gps_t type object
- * @return float Latitude or Longitude value (unit: degree)
+ * @return int32_t Latitude or Longitude value (unit: degree without dot)
  */
-static float parse_lat_long(esp_gps_t *esp_gps)
+static int32_t parse_lat_long(esp_gps_t *esp_gps)
 {
-    float ll = strtof(esp_gps->item_str, NULL);
-    int deg = ((int)ll) / 100;
-    float min = ll - (deg * 100);
-    ll = deg + min / 60.0f;
+    int32_t ll = 0;
+    int32_t deg = (strtof(esp_gps->item_str, NULL)) / 100;
+    int32_t min = (strtof(esp_gps->item_str, NULL)) - (deg * 100);
+    int32_t under_point = 0;
+    min = min * 10000000;
+
+    char raw[NMEA_MAX_STATEMENT_ITEM_LENGTH] = {0, };
+    strncpy(raw, esp_gps->item_str, NMEA_MAX_STATEMENT_ITEM_LENGTH);
+
+    printf("%s\r\n", esp_gps->item_str);
+
+    char under_point_str[NMEA_MAX_STATEMENT_ITEM_LENGTH] = {0, };
+
+    for (int i = 0; raw[i] != '\0'; i++)
+    {
+        if (raw[i] == '.')
+        {
+            strcpy(under_point_str, &(raw[i + 1]));
+            break;
+        }
+    }
+
+    under_point = atoi(under_point_str);
+    under_point = under_point * 10;
+    min += under_point;
+    ll = (deg * 10000000) + (min / 60);
+
     return ll;
 }
 
@@ -540,8 +563,14 @@ static esp_err_t gps_decode(esp_gps_t *esp_gps, size_t len)
                 if (((esp_gps->parsed_statement) & esp_gps->all_statements) == esp_gps->all_statements) {
                     esp_gps->parsed_statement = 0;
                     /* Send signal to notify that GPS information has been updated */
+
+                    #if (__GNSS_COORDINATE_MODE == 2)
+                    esp_event_post_to(esp_gps->event_loop_hdl, ESP_NMEA_EVENT, GPS_UPDATE,
+                                      esp_gps->buffer, len, 100 / portTICK_PERIOD_MS);
+                    #else
                     esp_event_post_to(esp_gps->event_loop_hdl, ESP_NMEA_EVENT, GPS_UPDATE,
                                       &(esp_gps->parent), sizeof(gps_t), 100 / portTICK_PERIOD_MS);
+                    #endif
                 }
             } else {
                 ESP_LOGD(GPS_TAG, "CRC Error for statement:%s", esp_gps->buffer);
@@ -696,7 +725,7 @@ nmea_parser_handle_t nmea_parser_init(const nmea_parser_config_t *config)
         ESP_LOGE(GPS_TAG, "config uart parameter failed");
         goto err_uart_config;
     }
-    if (uart_set_pin(esp_gps->uart_port, 9, config->uart.rx_pin,
+    if (uart_set_pin(esp_gps->uart_port, 26, config->uart.rx_pin,
                      UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE) != ESP_OK) {
         ESP_LOGE(GPS_TAG, "config uart gpio failed");
         goto err_uart_config;
