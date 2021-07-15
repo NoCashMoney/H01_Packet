@@ -77,8 +77,6 @@ static int32_t parse_lat_long(esp_gps_t *esp_gps)
     char raw[NMEA_MAX_STATEMENT_ITEM_LENGTH] = {0, };
     strncpy(raw, esp_gps->item_str, NMEA_MAX_STATEMENT_ITEM_LENGTH);
 
-    printf("%s\r\n", esp_gps->item_str);
-
     char under_point_str[NMEA_MAX_STATEMENT_ITEM_LENGTH] = {0, };
 
     for (int i = 0; raw[i] != '\0'; i++)
@@ -615,6 +613,10 @@ static void esp_handle_uart_pattern(esp_gps_t *esp_gps)
         if (gps_decode(esp_gps, read_len + 1) != ESP_OK) {
             ESP_LOGW(GPS_TAG, "GPS decode line failed");
         }
+
+    #if (__GNSS_COORDINATE_MODE == 2)
+        printf("%s", esp_gps->buffer);
+    #endif
     } else {
         ESP_LOGW(GPS_TAG, "Pattern Queue Size too small");
         uart_flush_input(esp_gps->uart_port);

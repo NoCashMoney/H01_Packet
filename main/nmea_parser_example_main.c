@@ -129,10 +129,7 @@ static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_ba
     case GPS_UPDATE:
         gps = (gps_t *)event_data;
 
-#if (__GNSS_COORDINATE_MODE == 2)
-        printf("%s", (char *)event_data);
-
-#elif (__GNSS_COORDINATE_MODE == 1)
+#if (__GNSS_COORDINATE_MODE == 1)
         /* print information parsed from GPS statements */
         ESP_LOGI(TAG, "%d/%d/%d %d:%d:%d => "
                  "\t\tlatitude   = %.05f°N"

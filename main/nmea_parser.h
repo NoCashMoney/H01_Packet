@@ -23,7 +23,7 @@ extern "C" {
 #include "esp_err.h"
 #include "driver/uart.h"
 
-#define __GNSS_COORDINATE_MODE (0) // 0: NAV_PVT OUTPUT  1: COORDINATE OUTPUT  2: GNSS DIRECT MODE
+#define __GNSS_COORDINATE_MODE (2) // 0: NAV_PVT OUTPUT  1: COORDINATE OUTPUT  2: GNSS DIRECT MODE
 
 #define GPS_MAX_SATELLITES_IN_USE (12)
 #define GPS_MAX_SATELLITES_IN_VIEW (16)
